@@ -8,7 +8,6 @@ import { Observable, Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class ChatService {
-
   // private base_url = "localhost:5001"
   // private base_url = "localhost:8080"
   private base_url = "vagabundo-webchat.westeurope.azurecontainer.io";
