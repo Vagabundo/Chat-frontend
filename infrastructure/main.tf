@@ -11,14 +11,23 @@ terraform {
 }
 
 terraform {
-  backend "remote" {
-    organization = "Vagacorp"
-
-    workspaces {
-      name = "web-chat-front"
-    }
+  backend "azurerm" {
+    resource_group_name  = "tf_rg_blobstore"
+    storage_account_name = "tfstorageaccvaga"
+    container_name       = "tfstatefront"
+    key                  = "terraform.tfstate"
   }
 }
+
+# terraform {
+#   backend "remote" {
+#     organization = "Vagacorp"
+
+#     workspaces {
+#       name = "web-chat-front"
+#     }
+#   }
+# }
 
 provider "azurerm" {
   features {}
@@ -45,11 +54,15 @@ resource "azurerm_app_service_plan" "freeplan" {
     tier = "Free"
     size = "F1"
   }
+
+  # esto no sería necesario si mas arriba usaramos azurerm_resource_group.webchatfront-rg.name,
+  # pero lo dejo como ejemplo de uso de depends_on
+  depends_on = [azurerm_resource_group.webchatfront-rg]
 }
 
 resource "azurerm_container_group" "webchat_containergroup" {
   name                = "${var.resource_group_name}-containergroup"
-  location            = var.location
+  location            = azurerm_resource_group.webchatfront-rg.location
   resource_group_name = var.resource_group_name
 
   ip_address_type = "public"
@@ -58,7 +71,7 @@ resource "azurerm_container_group" "webchat_containergroup" {
 
   container {
     name   = var.project_name
-    image  = "vagabundocker/${var.project_name}:latest"
+    image  = "vagabundocker/${var.project_name}"
     cpu    = "1"
     memory = "1"
 
