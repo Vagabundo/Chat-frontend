@@ -30,7 +30,6 @@ stages:
 #           $(tag)
 - stage: provision
   displayName: 'Terraforming on Azure'
-  dependsOn: Build
   jobs:
   - job: provision
     displayName: 'Provision infrastructure'
@@ -81,10 +80,11 @@ stages:
 
 - stage: deploy
   displayName: 'Deploy'
-  dependsOn: build
+  dependsOn: provision
   jobs:
   - deployment: deploy
     displayName: 'Deploy'
+    environment: dev
     strategy:
       runOnce:
         deploy:
