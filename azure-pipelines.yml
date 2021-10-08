@@ -84,7 +84,9 @@ stages:
   jobs:
   - deployment: deploy
     displayName: 'Deploy'
-    environment: PublicChat-Front-dev
+    environment: dev
+    pool:
+      vmImage: ubuntu-latest
     strategy:
       runOnce:
         deploy:
