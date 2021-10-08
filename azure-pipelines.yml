@@ -93,10 +93,19 @@ stages:
           - task: DownloadPipelineArtifact@1
             inputs:
               downloadPath: '$(System.DefaultWorkingDirectory)'
-          - task: AzureWebApp@1
+          # - task: AzureWebApp@1
+          #   inputs:
+          #     azureSubscription: 'Vagachat ARM front'
+          #     appType: 'webAppLinux'
+          #     appName: 'webchatfront-dev-appservice'
+          #     runtimeStack: 'NODE|14-lts'
+          #     startUpCommand: 'npm run start'
+          - task: AzureRmWebAppDeployment@4
             inputs:
+              ConnectionType: 'AzureRM'
               azureSubscription: 'Vagachat ARM front'
               appType: 'webAppLinux'
-              appName: 'webchatfront-dev-appservice'
-              runtimeStack: 'NODE|14-lts'
-              startUpCommand: 'npm run start'
+              WebAppName: 'webchatfront-dev-appservice'
+              packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+              RuntimeStack: 'NODE|14-lts'
+              StartupCommand: 'npm run start'
