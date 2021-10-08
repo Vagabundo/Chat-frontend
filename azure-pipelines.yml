@@ -66,14 +66,17 @@ stages:
         versionSpec: '14.x'
       displayName: 'Install Node.js'
     - script: |
-        npm install
+        npm install --only-prod
         npm run build --prod
       displayName: 'npm install, build'
     - task: ArchiveFiles@2
+      displayName: 'Archive files'
       inputs:
         rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        replaceExistingArchive: true
         includeRootFolder: false
     - task: PublishPipelineArtifact@0
+      displayName: 'Publish artifact'
       inputs:
         targetPath: '$(System.ArtifactsDirectory)'
 
@@ -91,6 +94,7 @@ stages:
         deploy:
           steps:
           - task: DownloadPipelineArtifact@1
+            displayName: 'Download artifact'
             inputs:
               downloadPath: '$(System.DefaultWorkingDirectory)'
           # - task: AzureWebApp@1
@@ -101,6 +105,7 @@ stages:
           #     runtimeStack: 'NODE|14-lts'
           #     startUpCommand: 'npm run start'
           - task: AzureRmWebAppDeployment@4
+            displayName: 'Push to Azure'
             inputs:
               ConnectionType: 'AzureRM'
               azureSubscription: 'Vagachat ARM front'
