@@ -57,7 +57,7 @@ stages:
   displayName: 'Build'
   jobs:
   - job: build_test
-    displayName: 'Build and test'
+    displayName: 'Build'
     pool:
       vmImage: ubuntu-latest
     steps:
@@ -67,7 +67,7 @@ stages:
       displayName: 'Install Node.js'
     - script: |
         npm install
-        npm run build
+        ng build --prod
       displayName: 'npm install, build'
     - task: ArchiveFiles@2
       inputs:
