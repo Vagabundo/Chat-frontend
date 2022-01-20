@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vagachat-ui
+spec:
+  selector:
+    matchLabels:
+      app: vagachat-ui
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: vagachat-ui
+    spec:
+      containers:
+        - name: vagachat-ui
+          image: vagabundocker/webchat-front
+          # env:
+          # - name: MY_VAR
+          #   value: "roberto"
+          resources:
+            # requests:
+            #   memory: "64Mi"
+            #   cpu: "200m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: 80
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          # livenessProbe:
+          #   tcpSocket:
+          #     port: 80
+          #   initialDelaySeconds: 15
+          #   periodSeconds: 20
+          ports:
+          - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vagachat-ui-service
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: vagachat-ui
