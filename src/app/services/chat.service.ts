@@ -8,14 +8,19 @@ import { Observable, Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class ChatService {
-  // private base_url = "localhost:5001"
+  private protocol = "http"
+  //private base_url = "localhost:5001"
   private base_url = "localhost:8080"
   //private base_url = "vagabundo-webchat.westeurope.azurecontainer.io";
 
-	private connection: any = new signalR.HubConnectionBuilder().withUrl("http://"+this.base_url+"/chatsocket")
+	private connection: any = new signalR.HubConnectionBuilder()
+                    .withUrl(this.protocol+"://"+this.base_url+"/chatsocket", /*{
+                      skipNegotiation: true,
+                      transport: signalR.HttpTransportType.WebSockets
+                    }*/)
 										.configureLogging(signalR.LogLevel.Information)
 										.build();
-	readonly POST_URL = "http://"+this.base_url+"/api/chat/send";
+	readonly POST_URL = this.protocol+"://"+this.base_url+"/api/chat/send";
 
 	private receivedMessageObject: Message = new Message();
 	private sharedObj = new Subject<Message>();
