@@ -108,7 +108,7 @@ stages:
             displayName: 'Push to Azure'
             inputs:
               ConnectionType: 'AzureRM'
-              azureSubscription: 'Vagachat ARM front'
+              azureSubscription: 'Vagachat ARM front2'
               appType: 'webAppLinux'
               WebAppName: 'webchatfront-dev-appservice'
               packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
