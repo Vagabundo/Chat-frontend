@@ -9,9 +9,9 @@ import { Observable, Subject } from 'rxjs';
 })
 export class ChatService {
   private protocol = "http"
-  //private base_url = "localhost:5001"
-  private base_url = "localhost:8080"
-  //private base_url = "vagabundo-webchat.westeurope.azurecontainer.io";
+  //private base_url = "localhost:5000" // localhost
+  //private base_url = "localhost:8080" // docker
+  private base_url = "vagabundo-webchat.westeurope.azurecontainer.io";
 
 	private connection: any = new signalR.HubConnectionBuilder()
                     .withUrl(this.protocol+"://"+this.base_url+"/chatsocket", /*{
