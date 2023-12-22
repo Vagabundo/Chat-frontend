@@ -101,17 +101,14 @@ resource "azurerm_app_service_plan" "linuxfreeplan" {
   depends_on = [azurerm_resource_group.webchatfront-rg]
 }
 
-# resource "azurerm_app_service" "vagachatfront-appservice" {
-#   name                = "${var.resource_group_name}-appservice"
-#   location            = var.location
-#   resource_group_name = var.resource_group_name
-#   app_service_plan_id = azurerm_app_service_plan.linuxfreeplan.id
+resource "azurerm_app_service" "vagachatfront-appservice" {
+  name                = "${var.resource_group_name}-appservice"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  app_service_plan_id = azurerm_app_service_plan.linuxfreeplan.id
 
-#   site_config {
-#     linux_fx_version = "NODE|10.14"
-#   }
-
-#   tags = {
-#     Environment = "Web chat"
-#   }
-# }
+  site_config {
+    linux_fx_version = "NODE|10.14"
+    use_32_bit_worker_process = true
+  }
+}
