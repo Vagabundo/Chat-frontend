@@ -12,24 +12,51 @@ variables:
   tag: '$(Build.BuildId)'
 
 stages:
-# - stage: Build
-#   displayName: Build image
+# - stage: provision
+#   displayName: 'Terraforming on Azure'
 #   jobs:
-#   - job: Build
-#     displayName: Build
+#   - job: provision
+#     displayName: 'Provision infrastructure'
 #     pool:
 #       vmImage: ubuntu-latest
+#     variables:
+#     - group: Terraform
 #     steps:
-#     - task: Docker@2
-#       inputs:
-#         containerRegistry: 'Vagabundocker Hub'
-#         repository: 'vagabundocker/webchat-front'
-#         command: 'buildAndPush'
-#         Dockerfile: '**/Dockerfile'
-#         tags: |
-#           $(tag)
-- stage: provision
+#     - script: |
+#         set -e
+
+#         cd infrastructure
+#         terraform init -input=false
+#         terraform apply -input=false -auto-approve
+#       name: 'RunTerraform'
+#       displayName: 'Run Terraform'
+#       env:
+#         ARM_CLIENT_ID: $(ARM_CLIENT_ID)
+#         ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+#         ARM_SUBSCRIPTION_ID: $(ARM_SUBSCRIPTION_ID)
+#         ARM_TENANT_ID: $(ARM_TENANT_ID)
+#         TF_VAR_imagebuild: $(tag)
+
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Vagabundocker Hub'
+        repository: 'vagabundocker/webchat-front'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          $(tag)
+
+- stage: Provision
   displayName: 'Terraforming on Azure'
+  dependsOn: Build
   jobs:
   - job: provision
     displayName: 'Provision infrastructure'
@@ -53,64 +80,64 @@ stages:
         ARM_TENANT_ID: $(ARM_TENANT_ID)
         TF_VAR_imagebuild: $(tag)
 
-- stage: build
-  displayName: 'Build'
-  jobs:
-  - job: build_test
-    displayName: 'Build'
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: NodeTool@0
-      inputs:
-        versionSpec: '14.x'
-      displayName: 'Install Node.js'
-    - script: |
-        npm install --only-prod
-        npm run build --prod
-      displayName: 'npm install, build'
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-        replaceExistingArchive: true
-        includeRootFolder: false
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish artifact'
-      inputs:
-        targetPath: '$(System.ArtifactsDirectory)'
+# - stage: build
+#   displayName: 'Build'
+#   jobs:
+#   - job: build_test
+#     displayName: 'Build'
+#     pool:
+#       vmImage: ubuntu-latest
+#     steps:
+#     - task: NodeTool@0
+#       inputs:
+#         versionSpec: '14.x'
+#       displayName: 'Install Node.js'
+#     - script: |
+#         npm install --only-prod
+#         npm run build --prod
+#       displayName: 'npm install, build'
+#     - task: ArchiveFiles@2
+#       displayName: 'Archive files'
+#       inputs:
+#         rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+#         replaceExistingArchive: true
+#         includeRootFolder: false
+#     - task: PublishPipelineArtifact@0
+#       displayName: 'Publish artifact'
+#       inputs:
+#         targetPath: '$(System.ArtifactsDirectory)'
 
-- stage: deploy
-  displayName: 'Deploy'
-  dependsOn: provision
-  jobs:
-  - deployment: deploy
-    displayName: 'Deploy'
-    environment: dev
-    pool:
-      vmImage: ubuntu-latest
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@1
-            displayName: 'Download artifact'
-            inputs:
-              downloadPath: '$(System.DefaultWorkingDirectory)'
-          # - task: AzureWebApp@1
-          #   inputs:
-          #     azureSubscription: 'Vagachat ARM front'
-          #     appType: 'webAppLinux'
-          #     appName: 'webchatfront-dev-appservice'
-          #     runtimeStack: 'NODE|14-lts'
-          #     startUpCommand: 'npm run start'
-          - task: AzureRmWebAppDeployment@4
-            displayName: 'Push to Azure'
-            inputs:
-              ConnectionType: 'AzureRM'
-              azureSubscription: 'Vagachat ARM front2'
-              appType: 'webAppLinux'
-              WebAppName: 'webchatfront-dev-appservice'
-              packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
-              RuntimeStack: 'NODE|14-lts'
-              StartupCommand: 'npm run start'
+# - stage: deploy
+#   displayName: 'Deploy'
+#   dependsOn: provision
+#   jobs:
+#   - deployment: deploy
+#     displayName: 'Deploy'
+#     environment: dev
+#     pool:
+#       vmImage: ubuntu-latest
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: DownloadPipelineArtifact@1
+#             displayName: 'Download artifact'
+#             inputs:
+#               downloadPath: '$(System.DefaultWorkingDirectory)'
+#           # - task: AzureWebApp@1
+#           #   inputs:
+#           #     azureSubscription: 'Vagachat ARM front'
+#           #     appType: 'webAppLinux'
+#           #     appName: 'webchatfront-dev-appservice'
+#           #     runtimeStack: 'NODE|14-lts'
+#           #     startUpCommand: 'npm run start'
+#           - task: AzureRmWebAppDeployment@4
+#             displayName: 'Push to Azure'
+#             inputs:
+#               ConnectionType: 'AzureRM'
+#               azureSubscription: 'Vagachat ARM front2'
+#               appType: 'webAppLinux'
+#               WebAppName: 'webchatfront-dev-appservice'
+#               packageForLinux: '$(System.DefaultWorkingDirectory)/**/*.zip'
+#               RuntimeStack: 'NODE|14-lts'
+#               StartupCommand: 'npm run start'
