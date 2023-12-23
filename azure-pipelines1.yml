@@ -93,7 +93,7 @@ stages:
 
 - stage: build
   displayName: 'Build'
-  dependsOn: provision
+  #dependsOn: provision
   jobs:
   - job: build_test
     displayName: 'Build'
