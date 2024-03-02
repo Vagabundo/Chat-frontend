@@ -120,8 +120,9 @@ resource "azurerm_app_service" "vagachatfront-appservice" {
   resource_group_name = var.resource_group_name
   app_service_plan_id = azurerm_app_service_plan.linuxfreeplan.id
   https_only = false
+  
   site_config {
-    always_on        = true
-    linux_fx_version = "vagabundocker/${var.project_name}:${var.imagebuild}"
+    linux_fx_version = "DOCKER|vagabundocker/${var.project_name}:${var.imagebuild}"
+    use_32_bit_worker_process = true
   }
 }
