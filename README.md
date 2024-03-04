@@ -1,3 +1,5 @@
+The frontend needed to play around with SignalR. Nothing out of this world coming from a Backend Sefotware engineer.
+
 # WebChatApp
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.7 and [NodeJS](https://nodejs.org/en/download/) version 14.14.0
